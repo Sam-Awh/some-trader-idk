@@ -5,9 +5,31 @@ import pandas as pd
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+import os
+# import imp
+# import ctypes
+# import _thread
+# import win32api
 
 colorama_init()
 
+# # --------------------------------------------
+# # Just something i copypasted off of stackoverflow to
+# # patch the stupid fortran error.
+# basepath = imp.find_module('numpy')[1]
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libmmd.dll'))
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libifcoremd.dll'))
+
+# # Now set our handler for CTRL_C_EVENT. Other control event 
+# # types will chain to the next handler.
+# def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+#     if dwCtrlType == 0: # CTRL_C_EVENT
+#         hook_sigint()
+#         return 1 # don't chain to the next handler
+#     return 0 # chain to the next handler
+
+# win32api.SetConsoleCtrlHandler(handler, 1)
+# # --------------------------------------------
 
 class Predictor:
     def __init__(self, file_path):
@@ -83,7 +105,7 @@ class Predictor:
             print("Exception while predicting data in predict.py predict() method.")
             print(e)
 
-    def get_high(self, file_path="client\streamscript\streams\STREAM_ethusd.csv"):
+    def get_high(self, file_path="client\streamscript\streams\STREAM_ethusdt.csv"):
         try:
             self.load_data(file_path)
             self.scale_data("high")
@@ -96,7 +118,7 @@ class Predictor:
             print("Exception while predicting high in predict.py get_high() method.")
             print(e)
 
-    def get_close(self, file_path="client\streamscript\streams\STREAM_ethusd.csv"):
+    def get_close(self, file_path="client\streamscript\streams\STREAM_ethusdt.csv"):
         try:
             self.load_data(file_path)
             self.scale_data("close")
@@ -109,7 +131,7 @@ class Predictor:
             print("Exception while predicting close in predict.py get_close() method.")
             print(e)
 
-    def get_low(self, file_path="client\streamscript\streams\STREAM_ethusd.csv"):
+    def get_low(self, file_path="client\streamscript\streams\STREAM_ethusdt.csv"):
         try:
             self.load_data(file_path)
             self.scale_data("low")
@@ -124,10 +146,13 @@ class Predictor:
 
 
 if __name__ == "__main__":
-    predictor = Predictor("client\streamscript\streams\STREAM_ethusd.csv")
-    print(f"⨯ {Fore.RED}{Style.NORMAL}For Debugging Purposes, you should call this class instead!")
-    print(f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― {Fore.RED}{Style.BRIGHT}Pyre{Fore.LIGHTMAGENTA_EX}{Style.BRIGHT}Trader {Fore.GREEN}{Style.BRIGHT}―――――――― ︙{Style.RESET_ALL}")
-    print(f"✚ {Fore.BLUE}{Style.NORMAL}Playing with those numbers, give me a second.{Style.RESET_ALL}")
+    predictor = Predictor("client\streamscript\streams\STREAM_ethusdt.csv")
+    print(
+        f"⨯ {Fore.RED}{Style.NORMAL}This script is running in debug mode.{Style.RESET_ALL}")
+    print(
+        f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― {Fore.RED}{Style.BRIGHT}Pyre{Fore.LIGHTMAGENTA_EX}{Style.BRIGHT}Trader {Fore.GREEN}{Style.BRIGHT}―――――――― ︙{Style.RESET_ALL}")
+    print(
+        f"✚ {Fore.BLUE}{Style.NORMAL}Playing with those numbers, give me a second.{Style.RESET_ALL}")
     print(
        f"◉ {Fore.GREEN}15m high ↩ {Style.BRIGHT}{predictor.get_high()}{Style.RESET_ALL}")
     print(

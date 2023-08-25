@@ -1,3 +1,4 @@
+import time
 from colorama import Style
 from colorama import Fore
 from colorama import init as colorama_init
@@ -5,14 +6,40 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import threading
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from keras.optimizers import RMSprop
 from keras.layers import LSTM, Bidirectional, Dense, Dropout
 from keras.models import Sequential
+import sys
+sys.path.append('client\streamscript')
+from run_streams import Streams
+import os
+# import imp
+# import ctypes
+# import _thread
+# import win32api
 
 colorama_init()
 
+# # --------------------------------------------
+# # Just something i copypasted off of stackoverflow to
+# # patch the stupid fortran error.
+# basepath = imp.find_module('numpy')[1]
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libmmd.dll'))
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libifcoremd.dll'))
+
+# # Now set our handler for CTRL_C_EVENT. Other control event 
+# # types will chain to the next handler.
+# def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+#     if dwCtrlType == 0: # CTRL_C_EVENT
+#         hook_sigint()
+#         return 1 # don't chain to the next handler
+#     return 0 # chain to the next handler
+
+# win32api.SetConsoleCtrlHandler(handler, 1)
+# # --------------------------------------------
 
 def load_data(file_path, value):
     try:
@@ -25,7 +52,7 @@ def load_data(file_path, value):
         x = np.reshape(x, (x.shape[0], x.shape[1], 1))
         return x, y, scaler
     except Exception as e:
-        print("Exception while loading data in model_test.py load_data() method.")
+        print("Exception while loading data in model_refresh.py load_data() method.")
         print(e)
 
 
@@ -40,7 +67,7 @@ def create_model():
         model.compile(optimizer=optimizer, loss='mean_squared_error')
         return model
     except Exception as e:
-        print("Exception while creating model in model_test.py create_model() method.")
+        print("Exception while creating model in model_refresh.py create_model() method.")
         print(e)
 
 
@@ -50,7 +77,7 @@ def train_model(model, x_train, y_train, type):
         model.fit(x_train, y_train, batch_size=128, epochs=500, verbose=0)
         return model
     except Exception as e:
-        print("Exception while training model in model_test.py train_model() method.")
+        print("Exception while training model in model_refresh.py train_model() method.")
         print(e)
 
 
@@ -63,11 +90,11 @@ def test_model(model, scaler, file_path, value):
         inputs = np.reshape(inputs, (inputs.shape[0], inputs.shape[1], 1))
         predicted = model.predict(inputs, verbose=0)
         predicted = scaler.inverse_transform(predicted)
-        plt.plot(price, color='red', label='Real BTC ' + value)
-        plt.plot(predicted, color='blue', label='Predicted BTC ' + value)
+        plt.plot(price, color='red', label='Real Market ' + value)
+        plt.plot(predicted, color='blue', label='Predicted Market ' + value)
         plt.title(value + " Prediction Results")
         plt.xlabel('Days')
-        plt.ylabel('BTC ' + value)
+        plt.ylabel('Market ' + value)
         plt.legend()
         plt.show()
         rmse = math.sqrt(mean_squared_error(price, predicted))
@@ -75,78 +102,62 @@ def test_model(model, scaler, file_path, value):
         print(f'◌ {Fore.GREEN}RMSE: {Style.BRIGHT}{rmse}{Style.RESET_ALL}')
         print(f'◌ {Fore.GREEN}Mean error: {Style.BRIGHT}{error}{Style.RESET_ALL}')
     except Exception as e:
-        print("Exception while testing model in model_test.py test_model() method.")
+        print("Exception while testing model in model_refresh.py test_model() method.")
         print(e)
 
 
 def model_close():
     try:
-        file_path = 'client\streamscript\streams\STREAM_ethusd.csv'
+        file_path = 'client\streamscript\streams\STREAM_ethusdt.csv'
         x_train, y_train, scaler = load_data(file_path, "close")
         model = create_model()
         trained_model = train_model(model, x_train, y_train, "close")
         test_model(trained_model, scaler, file_path, "close")
         trained_model.save('out/close.h5')
     except Exception as e:
-        print("Exception while training model in model_test.py model_close() method.")
-        print(e)
-
-
-def model_open():
-    try:
-        file_path = 'client\streamscript\streams\STREAM_ethusd.csv'
-        x_train, y_train, scaler = load_data(file_path, "open")
-        model = create_model()
-        trained_model = train_model(model, x_train, y_train, "open")
-        test_model(trained_model, scaler, file_path, "open")
-        trained_model.save('out/open.h5')
-    except Exception as e:
-        print("Exception while training model in model_test.py model_open() method.")
+        print("Exception while training model in model_refresh.py model_close() method.")
         print(e)
 
 
 def model_low():
     try:
-        file_path = 'client\streamscript\streams\STREAM_ethusd.csv'
+        file_path = 'client\streamscript\streams\STREAM_ethusdt.csv'
         x_train, y_train, scaler = load_data(file_path, "low")
         model = create_model()
         trained_model = train_model(model, x_train, y_train, "low")
         test_model(trained_model, scaler, file_path, "low")
         trained_model.save('out/low.h5')
     except Exception as e:
-        print("Exception while training model in model_test.py model_low() method.")
+        print("Exception while training model in model_refresh.py model_low() method.")
         print(e)
 
 
 def model_high():
     try:
-        file_path = 'client\streamscript\streams\STREAM_ethusd.csv'
+        file_path = 'client\streamscript\streams\STREAM_ethusdt.csv'
         x_train, y_train, scaler = load_data(file_path, "high")
         model = create_model()
         trained_model = train_model(model, x_train, y_train, "high")
         test_model(trained_model, scaler, file_path, "high")
         trained_model.save('out/high.h5')
     except Exception as e:
-        print("Exception while training model in model_test.py model_high() method.")
-        print(e)
-
-
-def model_volume():
-    try:
-        file_path = 'client\streamscript\streams\STREAM_ethusd.csv'
-        x_train, y_train, scaler = load_data(file_path, "volume")
-        model = create_model()
-        trained_model = train_model(model, x_train, y_train, "volume")
-        test_model(trained_model, scaler, file_path, "volume")
-        trained_model.save('out/volume.h5')
-    except Exception as e:
-        print("Exception while training model in model_test.py model_volume() method.")
+        print("Exception while training model in model_refresh.py model_high() method.")
         print(e)
 
 
 if __name__ == '__main__':
-    print(f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― Training ―――――――― ︙{Style.RESET_ALL}")
-    model_close()
-    model_high()
-    model_low()
-    print(f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― Done ―――――――― ︙{Style.RESET_ALL}")
+    try:
+        StreamThread = threading.Thread(target=Streams().run)
+        StreamThread.start()
+        time.sleep(1)
+        print(f"{Fore.LIGHTYELLOW_EX}{Style.BRIGHT}︙ ――――――――― Training ――――――――― ︙{Style.RESET_ALL}")
+        model_close()
+        model_high()
+        model_low()
+        print(f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― Done ―――――――― ︙{Style.RESET_ALL}")
+    except KeyboardInterrupt:
+        print(f"{Fore.LIGHTRED_EX}Stopping datastream...{Style.RESET_ALL}")
+        Streams().stop()
+        time.sleep(2)
+        print(f"{Fore.LIGHTRED_EX}Training Module shutting down...{Style.RESET_ALL}")
+        exit()
