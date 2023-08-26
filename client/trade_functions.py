@@ -1,78 +1,127 @@
-import okx.Trade
+import okx.Trade as Trade
+import okx.Account as Account
+import okx.MarketData as MarketData
 import pandas as pd
+import random
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+import os
+import time
+import dotenv
+# import imp
+# import ctypes
+# import _thread
+# import win32api
 
+# # --------------------------------------------
+# # Just something i copypasted off of stackoverflow to
+# # patch the stupid fortran error.
+# basepath = imp.find_module('numpy')[1]
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libmmd.dll'))
+# ctypes.CDLL(os.path.join(basepath, 'core', 'libifcoremd.dll'))
+
+# # Now set our handler for CTRL_C_EVENT. Other control event 
+# # types will chain to the next handler.
+# def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
+#     if dwCtrlType == 0: # CTRL_C_EVENT
+#         hook_sigint()
+#         return 1 # don't chain to the next handler
+#     return 0 # chain to the next handler
+
+# win32api.SetConsoleCtrlHandler(handler, 1)
+# # --------------------------------------------
+
+dotenv.load_dotenv()
 colorama_init()
 
-api = krakenex.API(
-    'xD4LQF39wdRlYhCqjLbCMY2ClGs7hOJXBej5ZPJaNxl6Y9/9YADbs2q9', 'TIpv6kuRmiVXoJq1yUFM3CoGe5I1Li25m2FU41XLPIjOo4R/EQ2FPQWWq/WBcbhThLUx2gtDq8O6QCxHadv0qg==')
-k = KrakenAPI(api)
-
+API_KEY = os.getenv("API_KEY")
+API_SECRET = os.getenv("API_SECRET")
+PASS_PHRASE = os.getenv("PASS_PHRASE")
+flag = "1"
 
 def magic(pc, cp, lr):
-    pc = float(pc)
-    cp = float(cp)
-    lr = float(lr)
-    return pc + (cp - lr)
-
+    try:
+        pc = float(pc)
+        cp = float(cp)
+        lr = float(lr)
+        return pc + (cp - lr)
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while calculating magic number in trader.py magic() method.{Style.RESET_ALL}")
+        print(e)
 
 def get_price():
-    price = k.get_ticker_information('XXBTZUSD')['c'][0][0]
-    print(
-        f"◉ {Fore.LIGHTYELLOW_EX}Current Price (CP) ↩ {Fore.CYAN}{Style.BRIGHT}{price}{Style.RESET_ALL}")
-    return price
+    try:
+        MarketDataAPI = MarketData.MarketAPI(api_key=API_KEY, api_secret_key=API_SECRET, passphrase=PASS_PHRASE, use_server_time=False, flag="1")
+        price = MarketDataAPI.get_ticker(
+            instId="ETH-USDT"
+        )
 
+        formatted = price['data'][0]['last']
+        # print( # debug only
+        #      f"◉ {Fore.LIGHTYELLOW_EX}Current Price (CP) ↩ {Fore.CYAN}{Style.BRIGHT}{formatted}{Style.RESET_ALL}")
+        return formatted
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while fetching current price in trader.py get_price() method.{Style.RESET_ALL}")
+        print(e)
 
 def balance():
-    # Get account balance
-    balance = k.get_account_balance()
+    try:
+        # Get account balance
+        AccountAPI = Account.AccountAPI(api_key=API_KEY, api_secret_key=API_SECRET, passphrase=PASS_PHRASE, use_server_time=False, flag="1")
+        b_eth = AccountAPI.get_account_balance(ccy="ETH")
+        avail_bal_eth = b_eth['data'][0]['details'][0]['availBal']
+        b_usdt = AccountAPI.get_account_balance(ccy="USDT")
+        avail_bal_usdt = b_usdt['data'][0]['details'][0]['availBal']
 
-    # Create a list of dictionaries to hold formatted data
-    formatted_balance = [{'asset': asset, 'balance': f'{vol:.8f}'}
-                         for asset, vol in balance['vol'].items()]
-
-    print(f"◉ {Fore.YELLOW}Fetched current account info:\n")
-
-    # Loop through each row of the formatted_balance dataframe and print the data in the desired format
-    for row in formatted_balance:
-        print(
-            f"↳ {Fore.LIGHTYELLOW_EX}{row['asset']}{Style.RESET_ALL} {Fore.CYAN}--> {Fore.CYAN}{Style.BRIGHT}{row['balance']}{Style.RESET_ALL}")
+        print(f"◉ {Fore.YELLOW}Fetched current account info:\n{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTMAGENTA_EX}ETH Balance ↪ {Fore.CYAN}{Style.BRIGHT}{avail_bal_eth}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}USDT Balance ↪ {Fore.CYAN}{Style.BRIGHT}{avail_bal_usdt}{Style.RESET_ALL}")
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while fetching account balance in trader.py balance() method.{Style.RESET_ALL}")
+        print(e)
 
 # Always Trust The Model.
-
-
 class AutoTrade:
     def __init__(self):
         pass
 
-    def buy(self, qty, price, take_profit):
-        cp = get_price()
+    def order(self, price, take_profit):
+        try:
+            AutoTradeAPI = Trade.TradeAPI(api_key=API_KEY, api_secret_key=API_SECRET, passphrase=PASS_PHRASE, use_server_time=False, flag="1")
+            cp = get_price()
 
-        buy_order = k.add_standard_order(
-            pair='XXBTZUSD',
-            type='buy',
-            ordertype='limit',
-            price=str(cp),
-            volume=str(qty),
-            close_ordertype="limit",
-            close_price=str(magic(pc=take_profit, cp=cp, lr=price) + 10),
-            validate=False,
-        )
+            # create a market buy order
+            randint1 = random.randint(10000, 99999999)
+            orderId1 = str(f"MARKETBUY{randint1}")
+            buy_order = AutoTradeAPI.place_order(
+                        instId="ETH-USDT",
+                        tdMode="cash",
+                        side="buy",
+                        clOrdId=f"BUY{orderId1}",
+                        ordType="market",
+                        sz="10"
+                    )
+            print(buy_order)
+            time.sleep(1)
 
-        balance()
-        print(buy_order)
+            # create a take profit order
+            randint2 = random.randint(10000, 99999999)
+            orderId2 = str(f"LIMITSELL{randint2}")
+            take_profit_order = AutoTradeAPI.place_order(
+                instId="ETH-USDT",
+                tdMode="cash",
+                clOrdId=f"TP{orderId2}",
+                side="sell",
+                ordType="limit",
+                sz="0.00604",
+                px=take_profit
+            )
 
-    def sell(self, quantity):
-        sell_order = k.add_standard_order(
-            pair='XXBTZUSD',
-            type_='sell',
-            ordertype='market',
-            volume=str(quantity),
-            validate=False,
-            userref=None
-        )
-
-        balance()
-        print(sell_order)
+            balance()
+            # printing this for debug
+            print(buy_order)
+            print(take_profit_order)
+        except Exception as e:
+            print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
+            print(e)
