@@ -100,7 +100,7 @@ class AutoTrade:
                         side="buy",
                         clOrdId=f"BUY{orderId1}",
                         ordType="market",
-                        sz="10"
+                        sz="20"
                     )
             print(buy_order)
             time.sleep(1)
@@ -114,8 +114,8 @@ class AutoTrade:
                 clOrdId=f"TP{orderId2}",
                 side="sell",
                 ordType="limit",
-                sz="0.00604",
-                px=take_profit
+                sz="0.0121",
+                px=f"{take_profit}"
             )
 
             balance()

@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
             data_stream_process.join()
             trader_process.join()
-            time.sleep(900)
+            time.sleep(600) # delay per trade.
 
     except KeyboardInterrupt:
         print(f"{Fore.LIGHTRED_EX}Stopping datastream...{Style.RESET_ALL}")

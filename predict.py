@@ -1,10 +1,13 @@
 from keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
+from client.streamscript.run_streams import Streams
 import numpy as np
 import pandas as pd
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+import multiprocessing
+import time
 import os
 # import imp
 # import ctypes
@@ -146,16 +149,32 @@ class Predictor:
 
 
 if __name__ == "__main__":
-    predictor = Predictor("client\streamscript\streams\STREAM_ethusdt.csv")
-    print(
-        f"⨯ {Fore.RED}{Style.NORMAL}This script is running in debug mode.{Style.RESET_ALL}")
-    print(
-        f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― {Fore.RED}{Style.BRIGHT}Pyre{Fore.LIGHTMAGENTA_EX}{Style.BRIGHT}Trader {Fore.GREEN}{Style.BRIGHT}―――――――― ︙{Style.RESET_ALL}")
-    print(
-        f"✚ {Fore.BLUE}{Style.NORMAL}Playing with those numbers, give me a second.{Style.RESET_ALL}")
-    print(
-       f"◉ {Fore.GREEN}15m high ↩ {Style.BRIGHT}{predictor.get_high()}{Style.RESET_ALL}")
-    print(
-        f"◉ {Fore.GREEN}15m close ↩ {Style.BRIGHT}{predictor.get_close()}{Style.RESET_ALL}")
-    print(
-       f"◉ {Fore.GREEN}15m low ↩ {Style.BRIGHT}{predictor.get_low()}{Style.RESET_ALL}")
+    try:
+        stream_process = multiprocessing.Process(target=Streams().run)
+        stream_process.start()
+        time.sleep(7)
+        predictor = Predictor("client\streamscript\streams\STREAM_ethusdt.csv")
+        print(
+            f"⨯ {Fore.RED}{Style.NORMAL}This script is running in debug mode.{Style.RESET_ALL}")
+        print(
+            f"{Fore.GREEN}{Style.BRIGHT}︙ ―――――――― {Fore.RED}{Style.BRIGHT}Pyre{Fore.LIGHTMAGENTA_EX}{Style.BRIGHT}Trader {Fore.GREEN}{Style.BRIGHT}―――――――― ︙{Style.RESET_ALL}")
+        print(
+            f"✚ {Fore.BLUE}{Style.NORMAL}Playing with those numbers, give me a second.{Style.RESET_ALL}")
+        print(
+           f"◉ {Fore.GREEN}15m high ↩ {Style.BRIGHT}{predictor.get_high()}{Style.RESET_ALL}")
+        print(
+            f"◉ {Fore.GREEN}15m close ↩ {Style.BRIGHT}{predictor.get_close()}{Style.RESET_ALL}")
+        print(
+           f"◉ {Fore.GREEN}15m low ↩ {Style.BRIGHT}{predictor.get_low()}{Style.RESET_ALL}")
+        file_path = "client/streamscript/streams/STREAM_ethusdt.csv"
+        os.remove(file_path)
+    except KeyboardInterrupt:
+        file_path = "client/streamscript/streams/STREAM_ethusdt.csv"
+        os.remove(file_path)
+        print(f"{Fore.RED}KeyboardInterrupt in predict.py main() method.{Style.RESET_ALL}")
+        exit()
+    except Exception as e:
+        file_path = "client/streamscript/streams/STREAM_ethusdt.csv"
+        os.remove(file_path)
+        print("Exception while running predict.py main() method.")
+        print(e)

@@ -83,8 +83,10 @@ class PyreTrader:
                         f'◌ {Fore.LIGHTYELLOW_EX}Signal ︙ {Fore.RED}{Style.BRIGHT}{signal}{Style.RESET_ALL}')
 
                 if signal == "Buy":
-                    floor_pred_close = math.floor(predicted_close)
-                    floor_live_price = math.floor(live_price)
+                    floor_pred_close = predicted_close
+                    floor_live_price = live_price
+                    print(floor_live_price)
+                    print(floor_pred_close)
                     try:
                         trading_client.order(
                             price=floor_live_price,
