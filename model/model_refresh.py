@@ -6,7 +6,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import threading
+import multiprocessing
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from keras.optimizers import RMSprop
@@ -40,6 +40,7 @@ colorama_init()
 
 # win32api.SetConsoleCtrlHandler(handler, 1)
 # # --------------------------------------------
+# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 def load_data(file_path, value):
     try:
@@ -147,9 +148,9 @@ def model_high():
 
 if __name__ == '__main__':
     try:
-        StreamThread = threading.Thread(target=Streams().run)
-        StreamThread.start()
-        time.sleep(1)
+        StreamProcess = multiprocessing.Process(target=Streams().run)
+        StreamProcess.start()
+        time.sleep(5)
         print(f"{Fore.LIGHTYELLOW_EX}{Style.BRIGHT}︙ ――――――――― Training ――――――――― ︙{Style.RESET_ALL}")
         model_close()
         model_high()
@@ -161,3 +162,8 @@ if __name__ == '__main__':
         time.sleep(2)
         print(f"{Fore.LIGHTRED_EX}Training Module shutting down...{Style.RESET_ALL}")
         exit()
+
+# quality of life update here as well.
+# you don't have to initialize the datastream anymore, it will automatically
+# start when you run the model_refresh.py file.
+# ~ sam

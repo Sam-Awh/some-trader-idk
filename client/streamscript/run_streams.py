@@ -30,21 +30,9 @@ import csv
 
 # win32api.SetConsoleCtrlHandler(handler, 1)
 # # --------------------------------------------
+# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 colorama_init()
-
-API_KEY="7fb3cdca-5e17-424f-8070-7a0e6aa2ec7b"
-API_SECRET="B46A417BC31279F5D465DC658C150D67"
-PASS_PHRASE="JARASjaras6969$demoapi"
-flag = "1"
-
-MarketDataAPI = MarketData.MarketAPI(API_KEY, API_SECRET, PASS_PHRASE, False, flag)
-ticker = MarketDataAPI.get_ticker(instId="ETH-USDT")
-
-timestamp = datetime.fromtimestamp(int(ticker['data'][0]['ts']) / 1000).strftime('%Y-%m-%d %H:%M:%S')
-high = ticker['data'][0]['high24h']
-low = ticker['data'][0]['low24h']
-close = ticker['data'][0]['last']
 
 csv_file_path = 'client\streamscript\streams\STREAM_ethusdt.csv'
 class DataStream:
@@ -78,32 +66,20 @@ class DataStream:
 
         if last_row is None:
             df.to_csv(self.filename, mode='w', header=True, index=False)
-            with open(csv_file_path, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([timestamp, high, low, close])
             return f"◉ {Fore.LIGHTBLUE_EX}Fetched data for {Style.BRIGHT}{self.symbol}{Style.RESET_ALL}{Fore.LIGHTBLUE_EX} at {Style.BRIGHT}{datetime.now()}{Style.RESET_ALL}"
 
         elif latest_row['close'].values[0] == last_row['close'].values[0]:
-            with open(csv_file_path, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([timestamp, high, low, close])
             return f"○ {Fore.LIGHTBLUE_EX}No new data, row already exists"
 
         else:
             latest_row.to_csv(self.filename, mode='a',
                               header=False, index=False)
-            with open(csv_file_path, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([timestamp, high, low, close])
             return f"◉ {Fore.LIGHTBLUE_EX}Fetched data for {Style.BRIGHT}{self.symbol}{Style.RESET_ALL}{Fore.LIGHTBLUE_EX} at {Style.BRIGHT}{datetime.now()}{Style.RESET_ALL}"
 
     def run(self):
         print(
             f"{Fore.BLUE}{Style.BRIGHT}︙ ―――――――――― Streams ――――――――― ︙{Style.RESET_ALL}")
         print(self.fetch_data())
-
-# btc_stream = DataStream( # idk why this is here smh.
-#     'XETHZUSD', r'client/streamscript/streams/STREAM_ethusdt.csv')
 
 
 class Streams:
@@ -126,3 +102,7 @@ if __name__ == '__main__': # debug only
         os.remove(csv_file_path)
         print(f"{Fore.LIGHTRED_EX}Shutting down datastream...{Style.RESET_ALL}")
         exit()
+
+# completely stripped this of threading/multiprocessing as it can be
+# used whenever you call these functions instead.
+# ~ sam

@@ -33,6 +33,7 @@ colorama_init()
 
 # win32api.SetConsoleCtrlHandler(handler, 1)
 # # --------------------------------------------
+# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 class Predictor:
     def __init__(self, file_path):
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     try:
         stream_process = multiprocessing.Process(target=Streams().run)
         stream_process.start()
-        time.sleep(7)
+        time.sleep(5)
         predictor = Predictor("client\streamscript\streams\STREAM_ethusdt.csv")
         print(
             f"⨯ {Fore.RED}{Style.NORMAL}This script is running in debug mode.{Style.RESET_ALL}")
@@ -178,3 +179,8 @@ if __name__ == "__main__":
         os.remove(file_path)
         print("Exception while running predict.py main() method.")
         print(e)
+
+# small quality of life update here, remember when you always have to initialize the datastream
+# and then call the predictor after? well now you can just call the predictor and it will
+# automatically initialize the datastream. saving 10 seconds i'd rather be using to buss.
+# ~ sam

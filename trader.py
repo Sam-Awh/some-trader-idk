@@ -30,6 +30,7 @@ from colorama import Style
 
 # win32api.SetConsoleCtrlHandler(handler, 1)
 # # --------------------------------------------
+# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 colorama_init()
 
@@ -83,14 +84,10 @@ class PyreTrader:
                         f'◌ {Fore.LIGHTYELLOW_EX}Signal ︙ {Fore.RED}{Style.BRIGHT}{signal}{Style.RESET_ALL}')
 
                 if signal == "Buy":
-                    floor_pred_close = predicted_close
-                    floor_live_price = live_price
-                    print(floor_live_price)
-                    print(floor_pred_close)
                     try:
                         trading_client.order(
-                            price=floor_live_price,
-                            take_profit=floor_pred_close,
+                            price=live_price,
+                            take_profit=predicted_close,
                         )
                         print(
                             f'◌ {Fore.LIGHTGREEN_EX}BUY Signal Executed! ︙ {Fore.CYAN}{Style.BRIGHT}10USDT{Style.RESET_ALL} {Fore.LIGHTGREEN_EX}of ETH{Style.RESET_ALL}')
@@ -110,3 +107,6 @@ class PyreTrader:
         except Exception as e:
             print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
             print(e)
+
+# this shit a mess nigga i cant. (not messier than client\trade_functions.py)
+# ~ sam

@@ -41,6 +41,47 @@ API_SECRET = os.getenv("API_SECRET")
 PASS_PHRASE = os.getenv("PASS_PHRASE")
 flag = "1"
 
+def magic(pc, cp, lr):
+    try:
+        pc = float(pc)
+        cp = float(cp)
+        lr = float(lr)
+        return pc + (cp - lr)
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while calculating magic number in trader.py magic() method.{Style.RESET_ALL}")
+        print(e)
+
+def get_price():
+    try:
+        MarketDataAPI = MarketData.MarketAPI(api_key=API_KEY, api_secret_key=API_SECRET, passphrase=PASS_PHRASE, use_server_time=False, flag="1")
+        price = MarketDataAPI.get_ticker(
+            instId="ETH-USDT"
+        )
+
+        formatted = price['data'][0]['last']
+        # print( # debug only
+        #      f"◉ {Fore.LIGHTYELLOW_EX}Current Price (CP) ↩ {Fore.CYAN}{Style.BRIGHT}{formatted}{Style.RESET_ALL}")
+        return formatted
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while fetching current price in trader.py get_price() method.{Style.RESET_ALL}")
+        print(e)
+
+def balance():
+    try:
+        # Get account balance
+        AccountAPI = Account.AccountAPI(api_key=API_KEY, api_secret_key=API_SECRET, passphrase=PASS_PHRASE, use_server_time=False, flag="1")
+        b_eth = AccountAPI.get_account_balance(ccy="ETH")
+        avail_bal_eth = b_eth['data'][0]['details'][0]['availBal']
+        b_usdt = AccountAPI.get_account_balance(ccy="USDT")
+        avail_bal_usdt = b_usdt['data'][0]['details'][0]['availBal']
+
+        print(f"◉ {Fore.YELLOW}Fetched current account info:\n{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTMAGENTA_EX}ETH Balance ↪ {Fore.CYAN}{Style.BRIGHT}{avail_bal_eth}{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTGREEN_EX}USDT Balance ↪ {Fore.CYAN}{Style.BRIGHT}{avail_bal_usdt}{Style.RESET_ALL}")
+    except Exception as e:
+        print(f"{Fore.LIGHTRED_EX}Exception while fetching account balance in trader.py balance() method.{Style.RESET_ALL}")
+        print(e)
+
 # Always Trust The Model.
 class AutoTrade:
     def __init__(self):
@@ -62,6 +103,7 @@ class AutoTrade:
                         ordType="market",
                         sz="20"
                     )
+            print(buy_order)
             time.sleep(1)
 
             # create a take profit order
@@ -84,10 +126,3 @@ class AutoTrade:
         except Exception as e:
             print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
             print(e)
-
-# ! message from sam uwu
-# so i didnt know where to start with fixing this shit after cooking all of that
-# useless shit in model\model_test.py to test the model's accuracy in realtime as
-# supposed to just downloading historical data from the past 7 days and running
-# predictions on that. the tests take 2.5 hours to finish 10 epochs and 15 minute intervals.
-# but hey it makes a nice graph and i personally buss to graphs. #! (pls help idk wtf im doing)
