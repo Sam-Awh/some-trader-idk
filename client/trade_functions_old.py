@@ -126,3 +126,5 @@ class AutoTrade:
         except Exception as e:
             print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
             print(e)
+
+# ! DEPRECATED !

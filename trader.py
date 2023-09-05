@@ -3,11 +3,11 @@ from datetime import datetime
 import os
 from predict import Predictor
 from client.streamscript.run_streams import Streams
-from client.trade_functions import AutoTrade
-import math
-from colorama import init as colorama_init
-from colorama import Fore
+from client.trade_functions_new import AutoTrade
 from colorama import Style
+from colorama import Fore
+from colorama import init as colorama_init
+
 # import imp
 # import ctypes
 # import _thread
@@ -40,6 +40,7 @@ LAST_TIMESTAMP_FILE = "last_timestamp.txt"
 class PyreTrader:
     def __init__(self):
         pass
+
     def run_trader():
         try:
             global predictor
@@ -55,13 +56,16 @@ class PyreTrader:
             time.sleep(1) # DONT REMOVE THIS. trading client needs to wait for datastream csv to be created to use the csv's data.
             Predictor.load_data(
                 self=Predictor, file_path="client\streamscript\streams\STREAM_ethusdt.csv")
+
             if Predictor.data.iloc[-1]["time"] != last_timestamp:
                 last_timestamp = Predictor.data.iloc[-1]["time"]
                 predicted_close = predictor.get_close()
+                predicted_low = predictor.get_low()
                 live_price = Predictor.data.iloc[-1]["close"]
                 signal = ""
 
                 if float(predicted_close) > float(live_price):
+                    tp = predicted_close
                     signal = "Buy"
                 elif float(predicted_close) < float(live_price):
                     signal = "Hold"
@@ -76,6 +80,7 @@ class PyreTrader:
                     f"◉ {Fore.LIGHTYELLOW_EX}15m Current close (LR) ↪ {Fore.CYAN}{Style.BRIGHT}{str(live_price)}{Style.RESET_ALL}")
                 print(
                     f"◉ {Fore.LIGHTYELLOW_EX}15m Predicted close (PC) ↪ {Fore.CYAN}{Style.BRIGHT}{str(predicted_close)}{Style.RESET_ALL}")
+
                 if signal == "Buy":
                     print(
                         f'◌ {Fore.LIGHTYELLOW_EX}Signal ︙ {Fore.GREEN}{Style.BRIGHT}{signal}{Style.RESET_ALL}')
@@ -85,9 +90,8 @@ class PyreTrader:
 
                 if signal == "Buy":
                     try:
-                        trading_client.order(
-                            price=live_price,
-                            take_profit=predicted_close,
+                        AutoTrade().order(
+                            tpTriggerPx=tp
                         )
                         print(
                             f'◌ {Fore.LIGHTGREEN_EX}BUY Signal Executed! ︙ {Fore.CYAN}{Style.BRIGHT}10USDT{Style.RESET_ALL} {Fore.LIGHTGREEN_EX}of ETH{Style.RESET_ALL}')
@@ -108,5 +112,7 @@ class PyreTrader:
             print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
             print(e)
 
-# this shit a mess nigga i cant. (not messier than client\trade_functions.py)
-# ~ sam
+# ! This kinda doesn't work because of **one** simple problem.
+# ! Error:
+# ! {'code': '1', 'data': [{'algoClOrdId': '', 'algoId': '', 'attachAlgoOrds': [], 'clOrdId': '', 'sCode': '51277', 'sMsg': 'TP trigger price cannot be higher than the last price ', 'tag': ''}], 'msg': ''}
+# Since we're supposed to use the model's close price predictions as the takeprofit price, I think the problem's in the predictions itself. but i may too brainfucked to be right here.
