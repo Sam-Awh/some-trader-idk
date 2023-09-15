@@ -3,34 +3,10 @@ from datetime import datetime
 import os
 from predict import Predictor
 from client.streamscript.run_streams import Streams
-from client.trade_functions_new import AutoTrade
+from client.trade_functions import AutoTrade
 from colorama import Style
 from colorama import Fore
 from colorama import init as colorama_init
-
-# import imp
-# import ctypes
-# import _thread
-# import win32api
-
-# # --------------------------------------------
-# # Just something i copypasted off of stackoverflow to
-# # patch the stupid fortran error.
-# basepath = imp.find_module('numpy')[1]
-# ctypes.CDLL(os.path.join(basepath, 'core', 'libmmd.dll'))
-# ctypes.CDLL(os.path.join(basepath, 'core', 'libifcoremd.dll'))
-
-# # Now set our handler for CTRL_C_EVENT. Other control event 
-# # types will chain to the next handler.
-# def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
-#     if dwCtrlType == 0: # CTRL_C_EVENT
-#         hook_sigint()
-#         return 1 # don't chain to the next handler
-#     return 0 # chain to the next handler
-
-# win32api.SetConsoleCtrlHandler(handler, 1)
-# # --------------------------------------------
-# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 colorama_init()
 
@@ -65,7 +41,6 @@ class PyreTrader:
                 signal = ""
 
                 if float(predicted_close) > float(live_price):
-                    tp = predicted_close
                     signal = "Buy"
                 elif float(predicted_close) < float(live_price):
                     signal = "Hold"
@@ -90,9 +65,7 @@ class PyreTrader:
 
                 if signal == "Buy":
                     try:
-                        AutoTrade().order(
-                            tpTriggerPx=tp
-                        )
+                        AutoTrade().order(live_price, predicted_close)
                         print(
                             f'◌ {Fore.LIGHTGREEN_EX}BUY Signal Executed! ︙ {Fore.CYAN}{Style.BRIGHT}10USDT{Style.RESET_ALL} {Fore.LIGHTGREEN_EX}of ETH{Style.RESET_ALL}')
                         pass
@@ -111,8 +84,3 @@ class PyreTrader:
         except Exception as e:
             print(f"{Fore.LIGHTRED_EX}Exception while running trader in trader.py run_trader() method.{Style.RESET_ALL}")
             print(e)
-
-# ! This kinda doesn't work because of **one** simple problem.
-# ! Error:
-# ! {'code': '1', 'data': [{'algoClOrdId': '', 'algoId': '', 'attachAlgoOrds': [], 'clOrdId': '', 'sCode': '51277', 'sMsg': 'TP trigger price cannot be higher than the last price ', 'tag': ''}], 'msg': ''}
-# Since we're supposed to use the model's close price predictions as the takeprofit price, I think the problem's in the predictions itself. but i may too brainfucked to be right here.

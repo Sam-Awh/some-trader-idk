@@ -8,29 +8,6 @@ from colorama import Fore
 from colorama import Style
 import okx.MarketData as MarketData
 import csv
-# import imp
-# import ctypes
-# import _thread
-# import win32api
-
-# # --------------------------------------------
-# # Just something i copypasted off of stackoverflow to
-# # patch the stupid fortran error.
-# basepath = imp.find_module('numpy')[1]
-# ctypes.CDLL(os.path.join(basepath, 'core', 'libmmd.dll'))
-# ctypes.CDLL(os.path.join(basepath, 'core', 'libifcoremd.dll'))
-
-# # Now set our handler for CTRL_C_EVENT. Other control event 
-# # types will chain to the next handler.
-# def handler(dwCtrlType, hook_sigint=thread.interrupt_main):
-#     if dwCtrlType == 0: # CTRL_C_EVENT
-#         hook_sigint()
-#         return 1 # don't chain to the next handler
-#     return 0 # chain to the next handler
-
-# win32api.SetConsoleCtrlHandler(handler, 1)
-# # --------------------------------------------
-# pls ignore this i tried fixing the stoobid fortran error but im too dumb for that.
 
 colorama_init()
 
