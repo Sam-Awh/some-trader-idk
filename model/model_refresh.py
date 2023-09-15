@@ -75,7 +75,7 @@ def create_model():
 def train_model(model, x_train, y_train, type):
     try:
         print(f"◍ {Fore.GREEN}Training the {Style.BRIGHT}{type}{Style.RESET_ALL} {Fore.GREEN}model{Style.RESET_ALL}")
-        model.fit(x_train, y_train, batch_size=128, epochs=500, verbose=0)
+        model.fit(x_train, y_train, batch_size=256, epochs=250, verbose=0)
         return model
     except Exception as e:
         print("Exception while training model in model_refresh.py train_model() method.")
