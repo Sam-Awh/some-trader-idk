@@ -1,7 +1,7 @@
 # Trading Strategy Backtesting with Gradient Boosting Classifier
 
 ## Introduction:
-This Jupyter Notebook contains Python code for backtesting a trading strategy using a Gradient Boosting Classifier. The strategy is based on predicting the direction of future price movements in the EUR/USD exchange rate. The code involves data retrieval, preprocessing, feature engineering, model training, testing, and performance analysis.
+This Jupyter Notebook contains Python code for backtesting a trading strategy using a Gradient Boosting Classifier. The strategy is based on predicting the direction of future price movements in the EUR/USD exchange rate. The project involves data retrieval, preprocessing, feature engineering, model training, testing, and performance analysis.
 
 ## Libraries Used:
 - `datetime`: For handling date and time information.
@@ -10,10 +10,13 @@ This Jupyter Notebook contains Python code for backtesting a trading strategy us
 - `yfinance`: For fetching historical financial data from Yahoo Finance.
 - `matplotlib` and `seaborn`: For data visualization.
 - `IPython.core.display`: For enhancing display capabilities.
+- `joblib`: For exporting model h5 files.
+
+Use "pip install -r requirements.txt" to install the needed libraries on your python environment.
 
 ## Data Retrieval:
-1. **Ticker Symbol**: 'EURUSD=X' is used for EUR/USD exchange rate.
-2. **Date Range**: Data is fetched for the period from July 25, 2023, to September 21, 2023.
+1. **Ticker Symbol**: 'EURUSD=X' is used for EUR/USD exchange rate. (more will be used in future)
+2. **Date Range**: Data is fetched for the period of 1 month.
 3. **Interval**: Data is collected at 30-minute intervals using the `yfinance` library.
 
 ## Data Preprocessing and Visualization:
@@ -35,6 +38,11 @@ This Jupyter Notebook contains Python code for backtesting a trading strategy us
 2. Equity is calculated based on the trading strategy's performance.
 3. Trades, profits, and equity are visualized through plots.
 4. A summary of trades is provided, including net profit, number of winning and losing trades, and other performance metrics.
+
+## Signal Interpretation:
+1. Exported model h5 file located in the models/ directory is used to predict the next ticker for selected interval relative to the latest ticker.
+2. Prediction value is either 0 or 1, where 0 refers to an increase in value, 1 refers to a decrease in value.
+3. The same is printed as output.
 
 ## Conclusion:
 The notebook demonstrates the process of developing, training, testing, and backtesting a trading strategy. Users can modify parameters, extend data ranges, or experiment with different classifiers to further enhance the strategy.
