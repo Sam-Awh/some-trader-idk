@@ -9,11 +9,14 @@ ticker_symbol = 'EURUSD=X'
 
 print("Options for ticker interval: 15m, 30m, 1h, 1d")
 ticker_interval = input("Enter an interval for signal prediction: ")
-if ticker_interval not in ['15m', '30m', '1h']: # , 1d]: # ! 1d granularity doesn't work right now, we don't have a model for it. Check first cell of trainer.ipynb for more info.
+if ticker_interval not in ['15m', '30m', '1h', '1d']:
     print("Invalid interval. Defaulting to 15m.")
     ticker_interval = '15m' # i dont even have to fuckging do this but im bored.
 
-ticker_period = '1mo'
+if ticker_interval == '1d':
+    ticker_period = '1y'
+else:
+    ticker_period = '1mo'
 print(f"Fetching data for {ticker_symbol} with {ticker_interval} interval for the last {ticker_period}.")
 
 try:
